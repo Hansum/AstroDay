@@ -64,7 +64,7 @@ const PictureOftheDay = () => {
           displayFormat="yyyy-MM-dd"
         />
       </div>
-      <h1 className="text-3xl text-center">PICTURE OF THE DAY</h1>
+      <h1 className="text-3xl text-center mt-20">PICTURE OF THE DAY</h1>
       {data.url ? (
         <div>
           <img
