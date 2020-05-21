@@ -3,12 +3,18 @@ import { DateSingleInput } from "@datepicker-react/styled";
 import Head from "next/head";
 import fetch from "node-fetch";
 import Link from "next/link";
-import Sample from "./info/sample";
-import useSWR from "swr";
+import PictureinfoComponent from "../components/PictureinfoComponent";
+import useSWR, { mutate } from "swr";
 import HomeComponent from "../components/HomeComponent";
 
 let getDateToday = () => {
   return new Date().toISOString().slice(0, 10);
+};
+
+let ConvertDate = (date) => {
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    .toISOString()
+    .split("T")[0];
 };
 
 const initialState = {
@@ -32,46 +38,50 @@ const fetcher = (url) => fetch(url).then((r) => r.json());
 const PictureOftheDay = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const DateToday = getDateToday();
-  const { data, error } = useSWR(`./api/NasaAPI?date=${DateToday}`, fetcher);
+  const { data, error } = useSWR(
+    state.date
+      ? `./api/NasaAPI?date=` + ConvertDate(state.date)
+      : `./api/NasaAPI?date=` + DateToday,
+    fetcher
+  );
 
   if (error) console.log("error loading data");
   if (!data) return <div>Fetching Picture</div>;
-  console.log("Data:", data);
-
-  console.log("Picked Date:", state.date);
+  console.log("Data:", DateToday);
 
   return (
-    // <div>
-    //   <h1>Date: {DateToday}</h1>
-    // </div>
     <HomeComponent>
-      <DateSingleInput
-        onDateChange={(data) => dispatch({ type: "dateChange", payload: data })}
-        onFocusChange={(focusedInput) =>
-          dispatch({ type: "focusChange", payload: focusedInput })
-        }
-        date={state.date}
-        showDatepicker={state.showDatepicker}
-        displayFormat="yyyy-MM-dd"
-      />
-      <h1>PICTURE OF THE DAY</h1>
-      <Link
-        href={{
-          pathname: "/info/sample",
-          query: {
-            date: `${data.date}`,
-            title: `${data.title}`,
-            photographer: `${data.copyright}`,
-            picture: `${data.url}`,
-          },
-        }}
-      >
-        <img
-          src={data.url}
-          alt="picture of the day"
-          style={{ cursor: "pointer" }}
-        ></img>
-      </Link>
+      <div className="">
+        <DateSingleInput
+          onDateChange={(data) =>
+            dispatch({ type: "dateChange", payload: data })
+          }
+          onFocusChange={(focusedInput) =>
+            dispatch({ type: "focusChange", payload: focusedInput })
+          }
+          date={state.date}
+          showDatepicker={state.showDatepicker}
+          displayFormat="yyyy-MM-dd"
+        />
+      </div>
+      <h1 className="text-3xl text-center">PICTURE OF THE DAY</h1>
+      {data.url ? (
+        <div>
+          <img
+            src={data.url}
+            alt="picture of the day"
+            className="block m-auto"
+          ></img>
+          <PictureinfoComponent
+            title={data.title}
+            date={data.date}
+            photographer={data.copyright}
+            description={data.explanation}
+          ></PictureinfoComponent>
+        </div>
+      ) : (
+        "no image found"
+      )}
     </HomeComponent>
   );
 };

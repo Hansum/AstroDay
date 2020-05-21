@@ -15,6 +15,8 @@ const API = async (date) => {
 //   });
 
 const APIresponse = async ({ query: { date } }, res) => {
+  // console.log("Request received", JSON.parse(req.query.date));
+  console.log("REQUEST", date);
   if (!date) {
     console.log("no date found");
   }

@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap");
+
+/* body {
+  @apply mt-12 mr-20 ml-20;
+} */
+
+/* @font-face {
+  font-family: Poppins;
+  font-weight: 500;
+  src: url("https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap");
+} */
+
+h1 {
+  @apply font-poppins font-semibold text-2xl;
+}
+
+span,
+p {
+  @apply font-medium text-lg;
+}
