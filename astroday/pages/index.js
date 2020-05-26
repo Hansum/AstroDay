@@ -51,18 +51,20 @@ const PictureOftheDay = () => {
 
   return (
     <HomeComponent>
-      <div className="">
-        <DateSingleInput
-          onDateChange={(data) =>
-            dispatch({ type: "dateChange", payload: data })
-          }
-          onFocusChange={(focusedInput) =>
-            dispatch({ type: "focusChange", payload: focusedInput })
-          }
-          date={state.date}
-          showDatepicker={state.showDatepicker}
-          displayFormat="yyyy-MM-dd"
-        />
+      <div className="flex justify-center">
+        <div className="4/5 lg:w-1/5">
+          <DateSingleInput
+            onDateChange={(data) =>
+              dispatch({ type: "dateChange", payload: data })
+            }
+            onFocusChange={(focusedInput) =>
+              dispatch({ type: "focusChange", payload: focusedInput })
+            }
+            date={state.date}
+            showDatepicker={state.showDatepicker}
+            displayFormat="yyyy-MM-dd"
+          />
+        </div>
       </div>
       <h1 className="text-3xl text-center mt-20">PICTURE OF THE DAY</h1>
       {data.url ? (
