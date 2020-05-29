@@ -1,21 +1,26 @@
 import React, { useReducer } from "react";
 import { DateSingleInput } from "@datepicker-react/styled";
-import Head from "next/head";
 import fetch from "node-fetch";
-import Link from "next/link";
-import PictureinfoComponent from "../components/PictureinfoComponent";
 import useSWR, { mutate } from "swr";
 import HomeComponent from "../components/HomeComponent";
 import search from "../public/searching.svg";
+import notFound from "../public/not-found.svg";
+import moment from "moment";
 
 let getDateToday = () => {
   return new Date().toISOString().slice(0, 10);
 };
 
 let ConvertDate = (date) => {
-  return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-    .toISOString()
-    .split("T")[0];
+  if (moment(date).isValid()) {
+    return moment(date).format("YYYY-MM-DD");
+  }
+};
+
+let ConvertDateToLong = (date) => {
+  if (moment(date).isValid()) {
+    return moment(date).format("MMMM Do");
+  }
 };
 
 const initialState = {
@@ -46,7 +51,17 @@ const PictureOftheDay = () => {
     fetcher
   );
 
-  if (error) console.log("error loading data");
+  if (error) {
+    <div className="flex h-screen">
+      <div className="m-auto">
+        <img className="mh-64 w-64" src={notFound} alt="searching photo"></img>
+        <h1 className="text-center">
+          Error fetching Picture. Try again next time.
+        </h1>
+      </div>
+    </div>;
+  }
+
   if (!data) {
     return (
       <div className="flex h-screen">
@@ -57,8 +72,10 @@ const PictureOftheDay = () => {
       </div>
     );
   }
-  console.log("Data:", DateToday);
+
+  console.log("Date today:", data.url);
   console.log("photographer", data.copyright);
+
   return (
     <HomeComponent>
       <div className="flex justify-center">
@@ -73,24 +90,41 @@ const PictureOftheDay = () => {
             date={state.date}
             showDatepicker={state.showDatepicker}
             displayFormat="yyyy-MM-dd"
+            phrases={{
+              datePlaceholder: "YYYY-MM-DD",
+            }}
           />
         </div>
       </div>
       {DateToday === data.date ? (
-        <h1 className="text-3xl text-center mt-20">PICTURE OF THE DAY</h1>
+        <h1 className="text-3xl text-center mt-20">
+          {ConvertDateToLong(DateToday)} {data.media_type} of the day
+        </h1>
       ) : (
-        <h1 className="text-3xl text-center mt-20">Picture of {data.date}</h1>
+        <h1 className="text-3xl text-center mt-20">
+          {ConvertDateToLong(data.date)} {data.media_type} of the day
+        </h1>
       )}
       {data.url ? (
         <div>
           <section className="text-gray-700 body-font">
             <div className="container px-5 py-24 mx-auto flex flex-wrap">
               <div className="lg:w-1/2 w-full mb-10 lg:mb-0 rounded-lg overflow-hidden">
-                <img
-                  alt="feature"
-                  className="object-cover object-center h-full w-full"
-                  src={data.url}
-                />
+                {data.media_type === "image" ? (
+                  <img
+                    alt="feature"
+                    className="object-cover object-center h-full w-full"
+                    src={data.url}
+                  />
+                ) : (
+                  <iframe
+                    className="h-full w-full"
+                    src={data.url}
+                    frameBorder="0"
+                    allow="autoplay; encrypted-media"
+                    allowFullScreen
+                  ></iframe>
+                )}
               </div>
               <div className="flex flex-col flex-wrap lg:py-6 -mb-10 lg:w-1/2 lg:pl-12 lg:text-left text-center">
                 <div className="flex flex-col mb-10 lg:items-start items-center">
@@ -168,7 +202,12 @@ const PictureOftheDay = () => {
           </section>
         </div>
       ) : (
-        "no image found"
+        <div className="flex h-screen">
+          <div className="m-auto">
+            <img className="m-auto" src={notFound} alt="searching photo"></img>
+            <h1 className="text-center">No image found. Try another date</h1>
+          </div>
+        </div>
       )}
     </HomeComponent>
   );
