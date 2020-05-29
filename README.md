@@ -1,2 +1,3 @@
 # AstroDay
-A picture Gallery for NASA's Astronomy Picture of the day.
+Search Astronomy Picture by dates.
+Api: Nasa Open API: Astronomy Picture of the Day(APOD)
